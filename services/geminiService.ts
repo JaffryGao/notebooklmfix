@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 
 // Standard prompt requested by user
 const SYSTEM_PROMPT = "你是一个专业的图像修复专家。";
-const USER_PROMPT = "请将这张图片用最高的分辨率生成，修复文字错误（但不可把一个文字改成另外一个不同文字）。请保持原图的构图、布局、文字内容完全一致，仅提升画质、清晰度以及修复文字错误。";
+const USER_PROMPT = "请将这张图片用最高的分辨率生成2. 修复图片中的中文文字错误，修复的过程中，如遇原文字特别不清晰的，或错误特别严重的，需要结合语境做解读，猜测它具体是什么文字。（但不可把一个文字改成另外一个毫不相干的文字）3. 请保持原图的构图、布局、文字内容完全一致，仅提升画质、清晰度以及修复文字错误。";
 
 // Helper to calculate closest aspect ratio supported by Gemini 3 Pro Image
 // Supported: "1:1", "3:4", "4:3", "9:16", "16:9"
