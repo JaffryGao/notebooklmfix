@@ -8,6 +8,7 @@ export interface ProcessedPage {
   height: number;
   aspectRatio: number; // width / height
   resolution?: '2K' | '4K'; // Track which resolution was used
+  selected: boolean;
 }
 
 export interface ProcessingStats {
@@ -27,4 +28,9 @@ declare global {
   interface Window {
     pdfjsLib: any;
   }
+}
+
+export interface QuotaInfo {
+  total: number;
+  remaining: number;
 }

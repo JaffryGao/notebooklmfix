@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Security & Admin Tools (Do not commit)
+scripts/
+README-KV.md
+README-DEPLOY.md
+.vercel
+.env*.local

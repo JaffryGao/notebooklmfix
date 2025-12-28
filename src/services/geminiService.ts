@@ -1,8 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Standard prompt requested by user
-const SYSTEM_PROMPT = "你是一个专业的图像修复专家。";
-const USER_PROMPT = "请将这张图片用最高的分辨率生成2. 修复图片中的中文文字错误，修复的过程中，如遇原文字特别不清晰的，或错误特别严重的，需要结合语境做解读，猜测它具体是什么文字。（但不可把一个文字改成另外一个毫不相干的文字）3. 请保持原图的构图、布局、文字内容完全一致，仅提升画质、清晰度以及修复文字错误。";
+import { SYSTEM_PROMPT, USER_PROMPT } from '../constants/prompts';
 
 // Helper to calculate closest aspect ratio supported by Gemini 3 Pro Image
 // Supported: "1:1", "3:4", "4:3", "9:16", "16:9"
@@ -28,8 +26,11 @@ export const checkApiKeySelection = async (): Promise<boolean> => {
   if (typeof window.aistudio !== 'undefined' && window.aistudio.hasSelectedApiKey) {
     return await window.aistudio.hasSelectedApiKey();
   }
-  // Check Local Storage
+  // Check Local Storage for API Key
   if (localStorage.getItem('gemini_api_key_local')) return true;
+
+  // Check Local Storage for Access Code (Commercial Mode)
+  if (localStorage.getItem('gemini_access_code')) return true;
 
   // Check Env Var
   if (process.env.API_KEY || process.env.GEMINI_API_KEY) return true;
@@ -45,27 +46,71 @@ export const promptForKeySelection = async (): Promise<void> => {
   }
 };
 
+import { QuotaInfo } from '../types';
+
 export const processImageWithGemini = async (
   base64Image: string,
   width: number,
   height: number,
   imageSize: '2K' | '4K' = '2K'
-): Promise<string> => {
+): Promise<{ image: string; quota?: QuotaInfo }> => {
+  // Check for Access Code first (Proxy Mode)
+  const accessCode = localStorage.getItem('gemini_access_code');
+
+  // Clean base64 string if it has prefix
+  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+
+  if (accessCode) {
+    // PROXY MODE
+    try {
+      const response = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: cleanBase64,
+          prompt: USER_PROMPT,
+          accessCode: accessCode,
+          imageSize: imageSize,
+          aspectRatio: getClosestAspectRatio(width, height)
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || `Proxy Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // Extract image from response validation
+      let imageStr = '';
+      if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+        for (const part of data.candidates[0].content.parts) {
+          if (part.inlineData && part.inlineData.data) {
+            imageStr = `data:image/png;base64,${part.inlineData.data}`;
+            break;
+          }
+        }
+      }
+
+      if (!imageStr) throw new Error("No image in proxy response");
+
+      return { image: imageStr, quota: data.quota };
+
+    } catch (e) {
+      console.error("Proxy Request Failed", e);
+      throw e;
+    }
+  }
+
+  // --- STANDARD MODE (Direct API Key) ---
   // Priority: 1. Google Project IDX (injected) 2. Local Storage 3. Environment Variable
   const localKey = localStorage.getItem('gemini_api_key_local');
   const envKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-
-  // If we are in IDX environment, SDK handles it automatically if we don't pass apiKey
-  // But if we have a local key or env key, we prefer that unless we are sure we are in IDX
 
   let apiKeyToUse = envKey;
   if (localKey) apiKeyToUse = localKey;
 
   const ai = new GoogleGenAI({ apiKey: apiKeyToUse });
-
-  // Clean base64 string if it has prefix
-  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
-
   const aspectRatio = getClosestAspectRatio(width, height);
 
   try {
@@ -97,7 +142,7 @@ export const processImageWithGemini = async (
     if (response.candidates && response.candidates[0].content && response.candidates[0].content.parts) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData && part.inlineData.data) {
-          return `data:image/png;base64,${part.inlineData.data}`;
+          return { image: `data:image/png;base64,${part.inlineData.data}` };
         }
       }
     }
