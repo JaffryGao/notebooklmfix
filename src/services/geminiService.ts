@@ -93,7 +93,12 @@ export const processImageWithGemini = async (
 
             const ctx = canvas.getContext('2d');
             if (ctx) {
-              // High quality downscaling
+              // 1. Fill White Background (Critical for transparent PNGs -> JPEG)
+              // Without this, transparent areas turn black in JPEG
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, width, height);
+
+              // 2. High quality downscaling
               ctx.imageSmoothingEnabled = true;
               ctx.imageSmoothingQuality = 'high';
               ctx.drawImage(img, 0, 0, width, height);
