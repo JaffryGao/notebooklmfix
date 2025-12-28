@@ -1,12 +1,10 @@
 {
-    "rewrites": [
-        {
-            "source": "/api/(.*)",
-            "destination": "/api/$1"
+    "functions": {
+        "api/proxy.js": {
+            "maxDuration": 60
         },
-        {
-            "source": "/(.*)",
-            "destination": "/index.html"
+        "api/verify-code.js": {
+            "maxDuration": 10
         }
-    ]
+    }
 }
