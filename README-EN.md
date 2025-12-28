@@ -45,16 +45,6 @@
   - **Real-time Comparison**: Long-press or click to compare quality before and after restoration.
   - **Mouse Follow Effects**: Immersive visual experience.
 
-## 🛠️ Tech Stack
-
-Built with modern Web technologies:
-
-- **App Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **AI Integration**: [Google GenAI SDK](https://www.npmjs.com/package/@google/genai) (Gemini)
-- **PDF Core**: [PDF.js](https://mozilla.github.io/pdf.js/) (Rendering) & [jsPDF](https://github.com/parallax/jsPDF) (Export)
-- **Presentation**: [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)
 
 ## 🚀 Try It Now
  
@@ -95,6 +85,17 @@ npm run dev
     - Confirm API Key status.
 4.  **Restore**: Click "Start Restoration".
 5.  **Export**: After restoration is complete, click the PDF or PPTX button at the bottom to download files.
+
+## 🛠️ Tech Stack
+
+Built with modern Web technologies:
+
+- **App Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **AI Integration**: [Google GenAI SDK](https://www.npmjs.com/package/@google/genai) (Gemini)
+- **PDF Core**: [PDF.js](https://mozilla.github.io/pdf.js/) (Rendering) & [jsPDF](https://github.com/parallax/jsPDF) (Export)
+- **Presentation**: [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)
 
 ## 🤝 Contributing
 

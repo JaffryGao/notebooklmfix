@@ -48,17 +48,6 @@
   - **实时对比**: 长按或点击即可查看修复前后的画质差异 (支持 Lightbox 缩放)。
   - **鼠标跟随动效**: 沉浸式的视觉体验。
 
-## 🛠️ 技术栈
-
-本项目基于现代 Web 技术构建：
-
-- **App Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **AI Integration**: [Google GenAI SDK](https://www.npmjs.com/package/@google/genai) (Gemini)
-- **PDF Core**: [PDF.js](https://mozilla.github.io/pdf.js/) (Rendering) & [jsPDF](https://github.com/parallax/jsPDF) (Export)
-- **Presentation**: [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)
-- **Data Store**: Vercel KV (Redis)
 
 ## 🚀 立即使用 (Online Usage)
  
@@ -99,6 +88,18 @@ npm run dev
     - 确认 API Key 状态。
 4.  **修复**: 点击 "开始增强 (Start Restoration)"。
 5.  **导出**: 修复完成后，点击底部的 PDF 或 PPTX 按钮下载文件。
+
+## 🛠️ 技术栈
+
+本项目基于现代 Web 技术构建：
+
+- **App Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **AI Integration**: [Google GenAI SDK](https://www.npmjs.com/package/@google/genai) (Gemini)
+- **PDF Core**: [PDF.js](https://mozilla.github.io/pdf.js/) (Rendering) & [jsPDF](https://github.com/parallax/jsPDF) (Export)
+- **Presentation**: [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)
+- **Data Store**: Vercel KV (Redis)
 
 ## 🤝 贡献
 
