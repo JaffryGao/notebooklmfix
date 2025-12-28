@@ -56,10 +56,49 @@ export const processImageWithGemini = async (
   const accessCode = localStorage.getItem('gemini_access_code');
 
   // Clean base64 string if it has prefix
-  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+  let cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
   if (accessCode) {
-    // PROXY MODE
+    // PROXY MODE - COMPRESSION CHECK
+    // Calculate approximate size in MB (Base64 length * 0.75 / 1024 / 1024)
+    const sizeInMB = (cleanBase64.length * 0.75) / (1024 * 1024);
+
+    // If larger than 6MB (safety margin for 10MB limit), compress it
+    if (sizeInMB > 6) {
+      try {
+        console.log(`Image too large (${sizeInMB.toFixed(2)}MB), compressing...`);
+        // Helper to compress image
+        const compressImage = (base64: string): Promise<string> => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              // Scale down to 80% if huge
+              const scale = 0.8;
+              canvas.width = img.width * scale;
+              canvas.height = img.height * scale;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // Return as JPEG 0.8 quality
+                resolve(canvas.toDataURL('image/jpeg', 0.8).replace(/^data:image\/jpeg;base64,/, ""));
+              } else {
+                resolve(base64); // Fallback
+              }
+            };
+            img.src = `data:image/png;base64,${base64}`;
+          });
+        };
+
+        cleanBase64 = await compressImage(cleanBase64);
+        const newSize = (cleanBase64.length * 0.75) / (1024 * 1024);
+        console.log(`Compressed size: ${newSize.toFixed(2)}MB`);
+
+      } catch (e) {
+        console.warn("Compression failed, sending original", e);
+      }
+    }
+
     try {
       const response = await fetch('/api/proxy', {
         method: 'POST',
