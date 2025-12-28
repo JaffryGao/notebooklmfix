@@ -59,33 +59,39 @@ export const processImageWithGemini = async (
   let cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
   if (accessCode) {
-    // PROXY MODE - COMPRESSION CHECK
-    // Calculate approximate size in MB (Base64 length * 0.75 / 1024 / 1024)
-    const sizeInMB = (cleanBase64.length * 0.75) / (1024 * 1024);
+    // PROXY MODE - STRICT COMPRESSION FOR VERCEL LIMIT (4.5MB)
+    // Target: Keep payload under 4MB to be safe
+    const LIMIT_MB = 4;
+    const currentSizeMB = (cleanBase64.length * 0.75) / (1024 * 1024);
 
-    // If larger than 6MB (safety margin for 10MB limit), compress it
-    if (sizeInMB > 6) {
+    if (currentSizeMB > LIMIT_MB) {
       try {
-        console.log(`Image too large (${sizeInMB.toFixed(2)}MB), compressing...`);
-        // Helper to compress image
+        console.log(`Image too large (${currentSizeMB.toFixed(2)}MB) for Vercel Free Limit (4.5MB), compressing...`);
+
         const compressImage = (base64: string): Promise<string> => {
           return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              // Scale down to 80% if huge
-              const scale = 0.8;
+
+              // Aggressive strategy: 
+              // If huge (>8MB), scale 0.5; if large (>4MB), scale 0.7
+              let scale = 0.7;
+              if (currentSizeMB > 8) scale = 0.5;
+
               canvas.width = img.width * scale;
               canvas.height = img.height * scale;
+
               const ctx = canvas.getContext('2d');
               if (ctx) {
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                // Return as JPEG 0.8 quality
-                resolve(canvas.toDataURL('image/jpeg', 0.8).replace(/^data:image\/jpeg;base64,/, ""));
+                // Use JPEG with lower quality (0.6) to ensure small size
+                resolve(canvas.toDataURL('image/jpeg', 0.6).replace(/^data:image\/jpeg;base64,/, ""));
               } else {
-                resolve(base64); // Fallback
+                resolve(base64);
               }
             };
+            img.onerror = () => resolve(base64);
             img.src = `data:image/png;base64,${base64}`;
           });
         };
