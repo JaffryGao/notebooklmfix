@@ -32,9 +32,7 @@ export const checkApiKeySelection = async (): Promise<boolean> => {
   // Check Local Storage for Access Code (Commercial Mode)
   if (localStorage.getItem('gemini_access_code')) return true;
 
-  // Check Env Var
-  if (process.env.API_KEY || process.env.GEMINI_API_KEY) return true;
-
+  // Security: Do NOT check process.env.GEMINI_API_KEY on client side
   return false;
 };
 
@@ -103,12 +101,15 @@ export const processImageWithGemini = async (
   }
 
   // --- STANDARD MODE (Direct API Key) ---
-  // Priority: 1. Google Project IDX (injected) 2. Local Storage 3. Environment Variable
+  // --- STANDARD MODE (Direct API Key) ---
+  // Priority: 1. Google Project IDX (injected) 2. Local Storage
   const localKey = localStorage.getItem('gemini_api_key_local');
-  const envKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
 
-  let apiKeyToUse = envKey;
-  if (localKey) apiKeyToUse = localKey;
+  if (!localKey) {
+    throw new Error("No API Key found. Please configure your key in settings.");
+  }
+
+  const apiKeyToUse = localKey;
 
   const ai = new GoogleGenAI({ apiKey: apiKeyToUse });
   const aspectRatio = getClosestAspectRatio(width, height);
