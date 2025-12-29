@@ -60,6 +60,13 @@ type TranslationKeys = {
     wechat: string;
     tip: string;
 
+    // Base URL
+    baseUrlLabel: string;
+    baseUrlPlaceholder: string;
+    baseUrlHint: string;
+    baseUrlInvalid: string;
+    clear: string;
+
     // Footer
     copyright: string;
     builtBy: string;
@@ -129,6 +136,13 @@ export const TRANSLATIONS: Record<Language, TranslationKeys> = {
         wechat: '微信',
         tip: '* For 4K Upscaling & Text Repair, please purchase a Passcode from the author.',
 
+        // Base URL
+        baseUrlLabel: 'Custom Base URL (Optional)',
+        baseUrlPlaceholder: 'https://your-proxy.example.com',
+        baseUrlHint: 'Only used in API Key mode; leave blank to use the default Google endpoint.',
+        baseUrlInvalid: 'Invalid Base URL (must be http/https)',
+        clear: 'Clear',
+
         // Footer
         copyright: "© 2026 NotebookLM Fixer.",
         builtBy: "Designed & Built by 懊侬 AoNong.",
@@ -195,6 +209,13 @@ export const TRANSLATIONS: Record<Language, TranslationKeys> = {
         contactMe: '联系购买:',
         wechat: '微信',
         tip: '* 4K 高清修复以及文字修复，请联系作者购买口令。',
+
+        // Base URL
+        baseUrlLabel: '自定义 Base URL (可选)',
+        baseUrlPlaceholder: 'https://你的代理域名.example.com',
+        baseUrlHint: '仅在 API Key 模式生效；留空则使用默认 Google 端点。',
+        baseUrlInvalid: 'Base URL 无效 (仅支持 http/https)',
+        clear: '清除',
 
         // Footer
         copyright: "© 2026 NotebookLM Fixer.",

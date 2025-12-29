@@ -13,6 +13,8 @@ interface ApiKeyModalProps {
 
 export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onSave, lang }) => {
     const [apiKey, setApiKey] = useState('');
+    const [baseUrl, setBaseUrl] = useState('');
+    const [baseUrlError, setBaseUrlError] = useState('');
     const [showKey, setShowKey] = useState(false);
     const [verifying, setVerifying] = useState(false);
     const [error, setError] = useState('');
@@ -27,11 +29,40 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onSav
         if (isOpen) {
             const savedKey = localStorage.getItem('gemini_api_key_local');
             const savedCode = localStorage.getItem('gemini_access_code');
+            const savedBaseUrl = localStorage.getItem('gemini_base_url_local');
             if (savedKey) setApiKey(savedKey);
             else if (savedCode) setApiKey(savedCode);
+            if (savedBaseUrl) setBaseUrl(savedBaseUrl);
+            else setBaseUrl('');
             setError('');
+            setBaseUrlError('');
         }
     }, [isOpen]);
+
+    const persistBaseUrl = (raw: string): boolean => {
+        const trimmed = raw.trim();
+        if (!trimmed) {
+            localStorage.removeItem('gemini_base_url_local');
+            setBaseUrlError('');
+            return true;
+        }
+
+        try {
+            const parsed = new URL(trimmed);
+            if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+                setBaseUrlError(t.baseUrlInvalid);
+                return false;
+            }
+            const normalized = parsed.toString().replace(/\/+$/, '');
+            localStorage.setItem('gemini_base_url_local', normalized);
+            setBaseUrl(normalized);
+            setBaseUrlError('');
+            return true;
+        } catch {
+            setBaseUrlError(t.baseUrlInvalid);
+            return false;
+        }
+    };
 
     const copyWechat = () => {
         navigator.clipboard.writeText('JaffryGao');
@@ -45,11 +76,14 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onSav
         if (!value) return;
 
         setError('');
+        setBaseUrlError('');
         setVerifying(true);
 
         try {
             // Smart Detection
             if (value.startsWith('AIza')) {
+                const baseUrlOk = persistBaseUrl(baseUrl);
+                if (!baseUrlOk) return;
                 // It's an API Key (Standard Mode)
                 localStorage.setItem('gemini_api_key_local', value);
                 localStorage.removeItem('gemini_access_code');
@@ -131,6 +165,48 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onSav
                                 </button>
                             </div>
                             {error && <p className="text-xs text-red-500 font-medium animate-in fade-in flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> {error}</p>}
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                                    {t.baseUrlLabel}
+                                </span>
+                                {baseUrl.trim() && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setBaseUrl('');
+                                            localStorage.removeItem('gemini_base_url_local');
+                                            setBaseUrlError('');
+                                        }}
+                                        className="text-[10px] text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                                    >
+                                        {t.clear}
+                                    </button>
+                                )}
+                            </div>
+
+                            <input
+                                type="text"
+                                value={baseUrl}
+                                onChange={(e) => {
+                                    setBaseUrl(e.target.value);
+                                    setBaseUrlError('');
+                                }}
+                                onBlur={() => persistBaseUrl(baseUrl)}
+                                placeholder={t.baseUrlPlaceholder}
+                                className="w-full bg-zinc-50 dark:bg-black/20 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                            />
+
+                            <p className="text-[10px] text-zinc-400 leading-tight">
+                                {t.baseUrlHint}
+                            </p>
+                            {baseUrlError && (
+                                <p className="text-xs text-red-500 font-medium animate-in fade-in flex items-center gap-1">
+                                    <ShieldCheck className="w-3 h-3" /> {baseUrlError}
+                                </p>
+                            )}
                         </div>
 
                         <button

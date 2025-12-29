@@ -22,6 +22,24 @@ const getClosestAspectRatio = (width: number, height: number): string => {
   return closest.label;
 };
 
+const getCustomGeminiBaseUrl = (): string | undefined => {
+  const raw =
+    localStorage.getItem('gemini_base_url_local')?.trim() ||
+    localStorage.getItem('gemini_base_url')?.trim() ||
+    import.meta.env.VITE_GEMINI_BASE_URL?.trim();
+
+  if (!raw) return undefined;
+
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined;
+    return url.toString().replace(/\/+$/, '');
+  } catch {
+    console.warn('Invalid Gemini base URL, ignoring:', raw);
+    return undefined;
+  }
+};
+
 export const checkApiKeySelection = async (): Promise<boolean> => {
   if (typeof window.aistudio !== 'undefined' && window.aistudio.hasSelectedApiKey) {
     return await window.aistudio.hasSelectedApiKey();
@@ -176,7 +194,12 @@ export const processImageWithGemini = async (
 
   const apiKeyToUse = localKey;
 
-  const ai = new GoogleGenAI({ apiKey: apiKeyToUse });
+  const baseUrl = getCustomGeminiBaseUrl();
+  const aiOptions: any = { apiKey: apiKeyToUse };
+  if (baseUrl) {
+    aiOptions.httpOptions = { baseUrl: baseUrl };
+  }
+  const ai = new GoogleGenAI(aiOptions);
   const aspectRatio = getClosestAspectRatio(width, height);
 
   try {

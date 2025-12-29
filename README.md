@@ -59,6 +59,12 @@
 首次打开时，点击右上角的 **"配置 API"** 按钮：
 1. **方式 A (自备 Key)**: 输入您的 Google Gemini API Key (需魔法，支持 2K)。
 2. **方式 B (口令)**: 输入口令 (**开箱即用**，免魔法，国内直连，支持 4K)。由作者承担高昂 API 成本，需付费获取，请联系 WeChat: JaffryGao
+
+#### （可选）自定义 Base URL
+如果你在 **自备 API Key 模式** 下需要走自建网关/代理，可在弹窗中配置 **自定义 Base URL**（仅支持 `http/https`）。
+- 留空：使用默认 Google 端点
+- 设置后：会写入浏览器本地 `localStorage['gemini_base_url_local']` 并在直连 SDK 请求中生效
+- 注意：**口令模式** 仍会走站点的 `/api/proxy`，不受该配置影响
 > **隐私承诺**: API Key 仅保存在浏览器本地，绝不会上传。
  
 ---
