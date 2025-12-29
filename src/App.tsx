@@ -27,6 +27,7 @@ import { AmbientBackground } from './components/ui/AmbientBackground';
 // Types & Assets
 import { ProcessedPage } from './types';
 import png4 from './assets/png4.png';
+import png5 from './assets/png5.png';
 
 // ================= Dictionary =================
 
@@ -370,15 +371,15 @@ const App: React.FC = () => {
                   <img src={png4} alt="Original" className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" />
                 </div>
                 <ArrowRight className="w-6 h-6 text-zinc-300 dark:text-zinc-600 rotate-90 md:rotate-0" />
-                <div className="relative group cursor-zoom-in w-full md:w-[45%] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-white/10 bg-black" onClick={() => setZoomedImage(png4)}>
-                  {/* Note: In original code both used png4/png5 properly or same image for demo, assuming png4 is 'before' and png5 is 'simulated after' or same image simplified for demo. The original code used png4 for first and png4 (zoomed) again? Let's check original. Original used png4 for first and omitted second src in the snippet I saw? Wait. Line 811 in original used `png5`? I'll assume png4 and png4 for now if I missed the asset import. Ah, I see png5 imported. */}
+                <div className="relative group cursor-zoom-in w-full md:w-[45%] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-white/10 bg-black" onClick={() => setZoomedImage(png5)}>
+                  {/* Note: In original code both used png4/png5 properly or same image for demo, assuming png4 is 'before' and png5 is 'simulated after' or same image simplified for demo. The original code used png4 for first and omitted second src in the snippet I saw? Wait. Line 811 in original used `png5`? I'll assume png4 and png4 for now if I missed the asset import. Ah, I see png5 imported. */}
                   <div className="absolute top-4 left-4 bg-indigo-500/90 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-20 border border-white/10 shadow-lg shadow-indigo-500/20">
                     {lang === 'en' ? 'Restored (Sharp)' : '修复后 (高清)'}
                   </div>
                   <div className="absolute bottom-4 right-4 bg-black/70 text-white text-[10px] font-mono px-2 py-1 rounded border border-white/10">
                     4K Resolution
                   </div>
-                  <img src={png4} alt="Restored" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                  <img src={png5} alt="Restored" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
                 </div>
               </div>
             </div>
