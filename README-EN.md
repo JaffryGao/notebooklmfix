@@ -97,6 +97,15 @@ Built with modern Web technologies:
 - **PDF Core**: [PDF.js](https://mozilla.github.io/pdf.js/) (Rendering) & [jsPDF](https://github.com/parallax/jsPDF) (Export)
 - **Presentation**: [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)
 
+## ⚠️ Disclaimer & Policy
+
+> **Please read before use**
+
+1.  **AI Limitations**: This tool uses Generative AI (GenAI) for image upscaling and restoration. While generally effective, it is **not 100% perfect**. For original text that is **extremely small, blurry, or illegible**, the AI may fail to recognize it or produce "hallucinations" (incorrect guesses). Please understand these technical limitations.
+2.  **Quota & Refund**:
+    *   **Deduction**: Quota is deducted only when a page is **successfully restored**.
+    *   **Refund**: If restoration fails due to network, AI errors, or server faults, the system will **automatically roll back** the count. Your quota will **not be consumed** for failed attempts.
+
 ## 🤝 Contributing
 
 Issues and Pull Requests are welcome!

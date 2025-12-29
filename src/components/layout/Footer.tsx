@@ -8,6 +8,14 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ t }) => {
     return (
         <footer className="w-full py-8 mt-auto border-t border-zinc-200 dark:border-white/5 bg-zinc-50/50 dark:bg-black/20 backdrop-blur-sm">
+            {/* Disclaimer Section */}
+            <div className="max-w-7xl mx-auto px-6 mb-8">
+                <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-500/20 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-200/80 leading-relaxed">
+                    <span className="font-bold mr-1">⚠️ {t.disclaimerTitle}:</span>
+                    {t.disclaimerText}
+                </div>
+            </div>
+
             <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-400 dark:text-zinc-500 font-mono-custom">
 
                 {/* Copyright */}

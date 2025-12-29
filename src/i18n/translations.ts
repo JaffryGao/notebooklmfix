@@ -66,6 +66,8 @@ type TranslationKeys = {
     rights: string;
     privacy: string;
     terms: string;
+    disclaimerTitle: string;
+    disclaimerText: string;
 };
 
 export const TRANSLATIONS: Record<Language, TranslationKeys> = {
@@ -134,7 +136,9 @@ export const TRANSLATIONS: Record<Language, TranslationKeys> = {
         builtBy: "Designed & Built by 懊侬 AoNong.",
         rights: "All rights reserved.",
         privacy: "Privacy Policy",
-        terms: "Terms of Service"
+        terms: "Terms of Service",
+        disclaimerTitle: "Disclaimer & Policy",
+        disclaimerText: "AI restoration involves redrawing and is not 100% perfect. Extremely small or blurry text in the original image may not be fully restored. Policy: Quota is deducted upon success; failed attempts are automatically refunded."
     },
     cn: {
         // App
@@ -201,6 +205,8 @@ export const TRANSLATIONS: Record<Language, TranslationKeys> = {
         builtBy: "由 懊侬 AoNong 设计与开发。",
         rights: "保留所有权利。",
         privacy: "隐私政策",
-        terms: "服务条款"
+        terms: "服务条款",
+        disclaimerTitle: "免责声明 & 计费规则",
+        disclaimerText: "AI 修复并非 100% 完美，对于原图中极小或极其模糊的文字，可能存在修复失败的情况，请予以理解。规则：修复成功扣费；若修复失败，额度会自动回退。"
     }
 };
