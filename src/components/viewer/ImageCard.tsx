@@ -76,9 +76,26 @@ export const ImageCard: React.FC<ImageCardProps> = ({
                     </>
                 )}
                 {page.status === 'error' && (
-                    <span className="bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-medium px-2.5 py-1 rounded-full border border-red-500/20 flex items-center gap-1.5 backdrop-blur-md shadow-lg">
-                        <AlertCircle className="w-3.5 h-3.5" /> {t.failed}
-                    </span>
+                    <div className="relative group/error">
+                        <span className="bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-medium px-2.5 py-1 rounded-full border border-red-500/20 flex items-center gap-1.5 backdrop-blur-md shadow-lg cursor-help transition-colors hover:bg-red-500/20">
+                            <AlertCircle className="w-3.5 h-3.5" /> {t.failed}
+                        </span>
+
+                        {/* Premium Tooltip */}
+                        <div className="absolute top-full right-0 mt-2 w-max max-w-[200px] p-3 bg-zinc-900/95 dark:bg-zinc-800/95 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl skew-y-0 origin-top-right transition-all duration-300 opacity-0 scale-95 translate-y-2 invisible group-hover/error:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:visible z-50">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Quota Safe</span>
+                                <p className="text-xs text-zinc-200 leading-relaxed font-medium">
+                                    生成失败不扣除次数。
+                                </p>
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-tight">
+                                    请等待当前批次结束后重试。
+                                </p>
+                            </div>
+                            {/* Arrow */}
+                            <div className="absolute -top-1 right-3 w-2 h-2 bg-zinc-900/95 dark:bg-zinc-800/95 border-t border-l border-white/10 rotate-45"></div>
+                        </div>
+                    </div>
                 )}
             </div>
 

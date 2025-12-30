@@ -20,9 +20,16 @@
 
 ## ✨ Core Features
 
-> **🚀 New in v2.2.1**
+> **🚀 New in v2.2.2 (UX Polish)**
+> - **Quota Safe Mode**:
+>   - **Smart Alerts**: Dual feedback via **Toast** & **Tooltip** when errors occur, explicitly confirming "No Quota Deducted".
+>   - **Safe Fail**: Network errors are automatically intercepted to protect your collected credits.
+> - **Auto 4K**: "Access Code Mode" now automatically locks resolution to **4K Ultra**, ensuring the best experience by default.
+> - **Disclaimer Restored**: A prominent new Disclaimer section added to the footer to clarify service rules and billing logic.
+>
+> **🚀 New in v2.2.1 (Hotfix)**
 > - **☁️ Cloudflare R2 Hybrid Integration**: Automatically detects oversized images and routes them via R2, bypassing Vercel's 4.5MB limit. 4K success rate boosted to 99.9%!
-> - **🛡️ Smart Quota Protection**: Prevents quota deduction if image generation fails or cannot be delivered.
+> - **🛡️ Smart Quota Protection**: Prevents quota deduction if image generation fails.
 >
 > **🚀 New in v2.2**
 > - **📦 Local Archive Box**: Automatically saves your generated high-res original images. Your history is preserved even after refreshing the page. Data is stored locally for privacy and security.
@@ -31,7 +38,7 @@
 > **🔥 New in v2.1**
 > - **Image Mode**: Support uploading single or multiple images (PNG/JPG/WEBP), not just PDFs.
 > - **On-Demand Processing**: Select specific pages to process to save quota.
-> - **Access Code**: v2.1 introduces the **Access Code** mode, supporting higher quality and simpler configuration compared to the traditional API Key mode. (High API costs covered by the author, paid access required. Contact WeChat: **JaffryGao**)
+> - **Access Code**: v2.1 introduces the **Access Code** mode, supporting higher quality and simpler configuration compared to the traditional API Key mode. (High API costs covered by the author, paid access required. Contact WeChat: **JaffryD**)
 >
 > | Feature | 🔑 Own API Key (Legacy) | 🎫 Access Code (New) |
 > | :--- | :--- | :--- |
@@ -63,7 +70,7 @@ No installation required, simply click the link below to get started:
 ### 🔑 Configure API Key
 On your first visit, click the **"Select API Key"** button in the top right corner:
 1. **Option A (Own Key)**: Enter your Google Gemini API Key (Requires VPN, supports 2K).
-2. **Option B (Access Code)**: Enter Access Code (**Ready to use**, Direct connection, supports 4K). High API costs covered by the author, paid access required. Contact WeChat: **JaffryGao**
+2. **Option B (Access Code)**: Enter Access Code (**Ready to use**, Direct connection, supports 4K). High API costs covered by the author, paid access required. Contact WeChat: **JaffryD**
 > **Privacy Promise**: Your Key is stored locally in your browser (LocalStorage) and is never uploaded to any server.
  
 ---

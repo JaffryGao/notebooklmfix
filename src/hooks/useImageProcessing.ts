@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ProcessedPage, QuotaInfo } from '../types';
 import { processImageWithGemini } from '../services/geminiService';
 import { AuthMode } from './useAuth';
@@ -27,7 +27,8 @@ export function useImageProcessing({
     setQuota,
     keyAuthorized,
     verifyKey,
-    handleSelectKey
+    handleSelectKey,
+    authMode
 }: UseImageProcessingProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isStopped, setIsStopped] = useState(false);
@@ -38,7 +39,24 @@ export function useImageProcessing({
     const [showCompletionBanner, setShowCompletionBanner] = useState(false);
     const [showStoppingToast, setShowStoppingToast] = useState(false);
 
+    // New Error Toast State
+    const [showErrorToast, setShowErrorToast] = useState(false);
+    const [errorToastMessage, setErrorToastMessage] = useState('');
+
+    // Auto-switch to 4K for Passcode Mode
+    useEffect(() => {
+        if (authMode === 'passcode') {
+            setResolution('4K');
+        }
+    }, [authMode]);
+
     const abortRef = useRef(false);
+
+    const triggerErrorToast = (msg: string) => {
+        setErrorToastMessage(msg);
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 4000);
+    };
 
     const startProcessing = async () => {
         // 1. Auth Check
@@ -118,6 +136,11 @@ export function useImageProcessing({
             } catch (error) {
                 console.error(`Page ${i + 1} Error:`, error);
                 newPages[i].status = 'error';
+
+                // Trigger Toast only for the first error in a batch to avoid spam
+                if (!showErrorToast) {
+                    triggerErrorToast('⚠️ 部分生成失败，不扣除次数 (Quota Safe)。请稍后重试。');
+                }
             }
 
             setPages([...newPages]);
@@ -161,6 +184,8 @@ export function useImageProcessing({
         showCompletionBanner,
         setShowCompletionBanner,
         showStoppingToast,
+        showErrorToast,
+        errorToastMessage,
         startProcessing,
         stopProcessing
     };

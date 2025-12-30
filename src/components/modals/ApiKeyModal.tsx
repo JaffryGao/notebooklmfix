@@ -34,7 +34,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onSav
     }, [isOpen]);
 
     const copyWechat = () => {
-        navigator.clipboard.writeText('JaffryGao');
+        navigator.clipboard.writeText('JaffryD');
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -228,7 +228,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onSav
                                                 <div className="flex flex-col gap-0.5">
                                                     <span className="text-[9px] text-zinc-400 uppercase tracking-wider">微信号</span>
                                                     <span className={`text-xs font-bold font-mono transition-colors ${copied ? 'text-emerald-500' : 'text-zinc-700 dark:text-zinc-200'}`}>
-                                                        {copied ? '✓ 已复制' : 'JaffryGao'}
+                                                        {copied ? '✓ 已复制' : 'JaffryD'}
                                                     </span>
                                                 </div>
                                                 <div className={`p-1.5 rounded-md shadow-sm border transition-all ${copied ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white dark:bg-zinc-700 border-zinc-200 dark:border-zinc-600 text-zinc-400 group-hover/copy:text-emerald-500'}`}>
