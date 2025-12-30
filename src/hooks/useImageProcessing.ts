@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { ProcessedPage, QuotaInfo } from '../types';
 import { processImageWithGemini } from '../services/geminiService';
 import { AuthMode } from './useAuth';
+import { saveToArchive } from '../db/archive';
 
 interface UseImageProcessingProps {
     pages: ProcessedPage[];
@@ -13,6 +14,12 @@ interface UseImageProcessingProps {
     verifyKey: () => Promise<boolean>;
     handleSelectKey: () => Promise<void>;
 }
+
+// Helper: Convert Base64 Data URL to Blob
+const dataURLtoBlob = async (dataurl: string): Promise<Blob> => {
+    const res = await fetch(dataurl);
+    return await res.blob();
+};
 
 export function useImageProcessing({
     pages,
@@ -89,6 +96,19 @@ export function useImageProcessing({
 
                 newPages[i].processedUrl = result.image;
                 newPages[i].status = 'completed';
+
+                // --- Archive Logic ---
+                try {
+                    const blob = await dataURLtoBlob(result.image);
+                    // Use Page Index as name since we don't store filenames per page in ProcessedPage
+                    await saveToArchive(blob, newPages[i].width, newPages[i].height, `Page ${newPages[i].pageIndex + 1}`, newPages[i].originalUrl);
+                    // Trigger simple shake animation in Header
+                    window.dispatchEvent(new Event('archive-saved'));
+                } catch (archiveErr) {
+                    console.error("Failed to archive image:", archiveErr);
+                    // Silent fail for archive - don't stop processing
+                }
+                // ---------------------
 
                 // Update Quota if returned (Access Code Mode)
                 if (result.quota) {

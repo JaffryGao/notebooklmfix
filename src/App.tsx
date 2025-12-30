@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Zap
 } from 'lucide-react';
+import { Testimonial } from './components/ui/Testimonial';
 
 // Hooks
 import { useAuth } from './hooks/useAuth';
@@ -22,20 +23,20 @@ import { Toast } from './components/ui/Toast';
 import { ComparisonModal } from './components/modals/ComparisonModal';
 import { ZoomModal } from './components/modals/ZoomModal';
 import { ApiKeyModal } from './components/modals/ApiKeyModal';
+import { ArchiveModal } from './components/modals/ArchiveModal';
 import { AmbientBackground } from './components/ui/AmbientBackground';
 
 // Types & Assets
 import { ProcessedPage } from './types';
 import png4 from './assets/png4.png';
 import png5 from './assets/png5.png';
+import { autoPruneArchives } from './db/archive';
 
 // ================= Dictionary =================
 
 import { TRANSLATIONS, Language } from './i18n/translations';
 
 type Theme = 'dark' | 'light';
-
-// Translations removed, imported from ./i18n/translations
 
 const App: React.FC = () => {
   // --- Hooks ---
@@ -89,6 +90,7 @@ const App: React.FC = () => {
   const [viewingIndex, setViewingIndex] = useState<number | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState<'pdf' | 'image'>('pdf');
   const [showUploadWarning, setShowUploadWarning] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false); // Track if user downloaded
@@ -99,7 +101,12 @@ const App: React.FC = () => {
 
   // Constants
   const t = TRANSLATIONS[lang];
-  // mouseGlowRef removed
+
+  // --- Init Effects ---
+  useEffect(() => {
+    // Prune old archives on mount
+    autoPruneArchives();
+  }, []);
 
   // --- Theme Sync ---
   useEffect(() => {
@@ -139,8 +146,6 @@ const App: React.FC = () => {
 
   const onReset = () => {
     setPages([]);
-    // setIsStopped/isStopping etc handled by hooks internal state mostly, but we can reset pages essentially
-    // For full reset we might need to expose reset from hooks, but empty pages usually resets UI
     setHasDownloaded(false);
     setShowCompletionBanner(false);
     setShowUploadWarning(false);
@@ -290,6 +295,7 @@ const App: React.FC = () => {
         handleSelectKey={() => setIsKeyModalOpen(true)} // Changed to just open modal
         openKeyModal={() => setIsKeyModalOpen(true)}
         onReset={onReset}
+        onOpenArchive={() => setIsArchiveModalOpen(true)}
       />
 
       <main className="relative z-10 flex-1 max-w-5xl mx-auto px-6 py-12 w-full flex flex-col gap-8">
@@ -356,32 +362,39 @@ const App: React.FC = () => {
               </label>
             </div>
 
-            {/* Comparison Demo */}
-            <div className="w-full max-w-4xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <div className="h-px w-12 bg-zinc-200 dark:bg-white/10"></div>
-                <span className="text-xs font-mono-custom text-zinc-400 uppercase tracking-widest">{lang === 'en' ? 'Comparison' : '效果对比'}</span>
-                <div className="h-px w-12 bg-zinc-200 dark:bg-white/10"></div>
-              </div>
-              <div className="flex flex-col md:flex-row gap-6 md:gap-12 justify-center items-center">
+            {/* Comparison Demo Section */}
+            <div className="w-full max-w-4xl mx-auto mt-24 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+              <div className="flex flex-col md:flex-row gap-8 md:gap-12 justify-center items-center">
+
+                {/* Before */}
                 <div className="relative group cursor-zoom-in w-full md:w-[45%] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-white/10 bg-black" onClick={() => setZoomedImage(png4)}>
-                  <div className="absolute top-4 left-4 bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-20 border border-white/10 shadow-lg">
-                    {lang === 'en' ? 'Original (Blurry)' : '修复前 (模糊)'}
+                  <div className="absolute top-4 left-4 bg-black/60 text-white/90 text-[10px] font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-20 border border-white/10 shadow-lg tracking-wide uppercase">
+                    {lang === 'en' ? 'Original' : '修复前'}
                   </div>
-                  <img src={png4} alt="Original" className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" />
+                  <img src={png4} alt="Original" className="w-full h-full object-cover opacity-60 hover:opacity-80 hover:scale-105 transition-all duration-700" />
                 </div>
-                <ArrowRight className="w-6 h-6 text-zinc-300 dark:text-zinc-600 rotate-90 md:rotate-0" />
-                <div className="relative group cursor-zoom-in w-full md:w-[45%] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-white/10 bg-black" onClick={() => setZoomedImage(png5)}>
-                  {/* Note: In original code both used png4/png5 properly or same image for demo, assuming png4 is 'before' and png5 is 'simulated after' or same image simplified for demo. The original code used png4 for first and omitted second src in the snippet I saw? Wait. Line 811 in original used `png5`? I'll assume png4 and png4 for now if I missed the asset import. Ah, I see png5 imported. */}
-                  <div className="absolute top-4 left-4 bg-indigo-500/90 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-20 border border-white/10 shadow-lg shadow-indigo-500/20">
-                    {lang === 'en' ? 'Restored (Sharp)' : '修复后 (高清)'}
+
+                <ArrowRight className="w-5 h-5 text-zinc-300/50 dark:text-zinc-700 p-0.5 border border-zinc-300/30 dark:border-white/10 rounded-full rotate-90 md:rotate-0" />
+
+                {/* After */}
+                <div className="relative group cursor-zoom-in w-full md:w-[45%] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-indigo-500/20 dark:border-indigo-400/20 ring-1 ring-indigo-500/20 dark:ring-indigo-400/10 bg-black" onClick={() => setZoomedImage(png5)}>
+                  <div className="absolute top-4 left-4 bg-indigo-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-20 shadow-lg shadow-indigo-500/20 tracking-wide uppercase">
+                    {lang === 'en' ? 'Pro RESTORED' : 'PRO 修复后'}
                   </div>
-                  <div className="absolute bottom-4 right-4 bg-black/70 text-white text-[10px] font-mono px-2 py-1 rounded border border-white/10">
-                    4K Resolution
+                  <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur text-white/90 text-[9px] font-mono px-2 py-1 rounded border border-white/10">
+                    4K Ultra HD
                   </div>
                   <img src={png5} alt="Restored" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+
+                  {/* Sheen Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/0 via-indigo-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
                 </div>
               </div>
+            </div>
+
+            {/* Social Proof (Testimonial) */}
+            <div className="mt-8 mb-12">
+              <Testimonial lang={lang} />
             </div>
           </div>
         )}
@@ -460,6 +473,12 @@ const App: React.FC = () => {
       />
 
       <ZoomModal zoomedImage={zoomedImage} onClose={() => setZoomedImage(null)} />
+
+      <ArchiveModal
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        lang={lang}
+      />
 
       <ApiKeyModal
         isOpen={isKeyModalOpen}

@@ -1,13 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { QuotaInfo } from '../types';
-import { checkApiKeySelection, promptForKeySelection } from '../services/geminiService';
+import { checkApiKeySelection, promptForKeySelection, validateAccessCode } from '../services/geminiService';
 
 export type AuthMode = 'key' | 'passcode';
 
 export function useAuth() {
-    const [keyAuthorized, setKeyAuthorized] = useState(false);
-    const [quota, setQuota] = useState<QuotaInfo | null>(null);
-    const [authMode, setAuthMode] = useState<AuthMode>('key');
+    // 1. Synchronous Initialization (Fixes FOUC)
+    const [keyAuthorized, setKeyAuthorized] = useState(() => {
+        // Guard for SSR
+        if (typeof window === 'undefined') return false;
+        return !!(localStorage.getItem('gemini_api_key_local') || localStorage.getItem('gemini_access_code'));
+    });
+
+    const [authMode, setAuthMode] = useState<AuthMode>(() => {
+        if (typeof window === 'undefined') return 'key';
+        return localStorage.getItem('gemini_access_code') ? 'passcode' : 'key';
+    });
+
+    const [quota, setQuota] = useState<QuotaInfo | null>(() => {
+        if (typeof window === 'undefined') return null;
+        const saved = localStorage.getItem('gemini_quota_cache');
+        return saved ? JSON.parse(saved) : null;
+    });
 
     // Handle keys from child components or other tabs
     const handleSaveLocalKey = useCallback((key: string, newQuota?: QuotaInfo) => {
@@ -53,33 +67,33 @@ export function useAuth() {
         }
     }, [verifyKey]);
 
-    // Initial Check
+    // Async Quota Re-validation (Silent)
     useEffect(() => {
-        verifyKey();
-        window.addEventListener('storage', handleStorageChange);
-
-        // Initial load cache
         const savedCode = localStorage.getItem('gemini_access_code');
         if (savedCode) {
-            setAuthMode('passcode');
-            // Load cached quota
-            const savedQuota = localStorage.getItem('gemini_quota_cache');
-            if (savedQuota) {
-                setQuota(JSON.parse(savedQuota));
-            }
+            // Re-validate with server to get fresh quota
+            // Using static import for robustness
+            // NOTE: This call must succeed. If it fails (e.g. backend code not deployed), 
+            // quota will just remain cached.
+            validateAccessCode(savedCode).then(result => {
+                if (result.valid && result.quota) {
+                    console.log("[Auto-Sync] Quota updated:", result.quota);
+                    setQuota(result.quota);
+                    setKeyAuthorized(true);
+                    localStorage.setItem('gemini_quota_cache', JSON.stringify(result.quota));
+                } else {
+                    console.warn('[Auto-Sync] Validation failed:', result.error);
+                }
+            });
+        } else {
+            // If no passcode, check key (legacy logic)
+            // But strict init above covers us, verifyKey effectively double checks.
+            verifyKey();
         }
 
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, [verifyKey, handleStorageChange]);
-
-    // Sync quota to local storage
-    useEffect(() => {
-        if (quota) {
-            localStorage.setItem('gemini_quota_cache', JSON.stringify(quota));
-        }
-    }, [quota]);
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []); // Run once on mount
 
     return {
         keyAuthorized,

@@ -11,7 +11,7 @@ import { ProcessedPage } from '../../types';
 interface ImageCardProps {
     page: ProcessedPage;
     index: number;
-    currentProcessingIndex: number | null; // Changed from -1 to null to match useImageProcessing
+    currentProcessingIndex: number | null;
     resolution: string;
     t: any;
     isProcessing: boolean;
@@ -31,6 +31,8 @@ export const ImageCard: React.FC<ImageCardProps> = ({
     setViewingIndex,
     handleDownloadSingleImage
 }) => {
+    // No animation logic needed here anymore
+
     return (
         <div
             onClick={() => !page.processedUrl && toggleSelection(index)}

@@ -20,6 +20,10 @@
 
 ## ✨ Core Features
 
+> **🚀 New in v2.2**
+> - **📦 Local Archive Box**: Automatically saves your generated high-res original images. Your history is preserved even after refreshing the page. Data is stored locally for privacy and security.
+> - **⚡️ Passcode Count Real-time Sync**: Fixed the issue where usage count updates were delayed in Passcode mode. Refreshing the page now syncs the latest count instantly.
+>
 > **🔥 New in v2.1**
 > - **Image Mode**: Support uploading single or multiple images (PNG/JPG/WEBP), not just PDFs.
 > - **On-Demand Processing**: Select specific pages to process to save quota.

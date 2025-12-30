@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
     try {
         // Node.js runtime automatically parses JSON body into req.body
-        const { image, prompt, accessCode, imageSize, aspectRatio } = req.body;
+        const { image, prompt, accessCode, imageSize, aspectRatio, validateOnly } = req.body;
 
         // 1. Validate Access Code & Quota via Vercel KV (Hash)
         const key = `ac:${accessCode}`;
@@ -29,6 +29,18 @@ export default async function handler(req, res) {
         }
 
         const remaining = parseInt(quotaData.remaining);
+
+        // --- VALIDATION ONLY MODE ---
+        if (validateOnly) {
+            return res.status(200).json({
+                valid: true,
+                quota: {
+                    total: parseInt(quotaData.total),
+                    remaining: Math.max(0, remaining)
+                }
+            });
+        }
+
         if (remaining <= 0) {
             return res.status(403).json({
                 error: "配额已用尽 (Quota Exceeded)",

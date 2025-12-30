@@ -219,3 +219,27 @@ export const processImageWithGemini = async (
     throw error;
   }
 };
+
+export const validateAccessCode = async (accessCode: string): Promise<{ valid: boolean; quota?: QuotaInfo; error?: string }> => {
+  try {
+    const response = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accessCode: accessCode,
+        validateOnly: true
+      })
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      return { valid: false, error: data.error };
+    }
+
+    const data = await response.json();
+    return { valid: true, quota: data.quota };
+  } catch (error) {
+    console.error("Validation Failed", error);
+    return { valid: false, error: "Network Error" };
+  }
+};

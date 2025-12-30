@@ -1,7 +1,9 @@
-import React from 'react';
-import { Sparkles, AlertCircle, CheckCircle, Languages, Sun, Moon, Zap } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Sparkles, AlertCircle, CheckCircle, Languages, Sun, Moon, Zap, Archive } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { QuotaInfo } from '../../types';
+import { useArchive } from '../../hooks/useArchive';
+import { OnboardingTooltip } from '../ui/OnboardingTooltip';
 
 interface HeaderProps {
     t: any;
@@ -14,6 +16,7 @@ interface HeaderProps {
     handleSelectKey: () => void;
     openKeyModal: () => void;
     onReset: () => void;
+    onOpenArchive: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,10 +29,23 @@ export const Header: React.FC<HeaderProps> = ({
     toggleLanguage,
     handleSelectKey,
     openKeyModal,
-    onReset
+    onReset,
+    onOpenArchive
 }) => {
+    const { totalCount } = useArchive();
+    const [isShaking, setIsShaking] = useState(false);
+
+    useEffect(() => {
+        const handleSave = () => {
+            setIsShaking(true);
+            setTimeout(() => setIsShaking(false), 500);
+        };
+        window.addEventListener('archive-saved', handleSave);
+        return () => window.removeEventListener('archive-saved', handleSave);
+    }, []);
+
     return (
-        <header className="sticky top-0 z-50 border-b border-zinc-200/50 dark:border-white/5 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl">
+        <header className="sticky top-0 z-50 border-b border-zinc-200/50 dark:border-white/5 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo - Clickable to reset/home */}
                 <button
@@ -51,7 +67,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <div className="flex items-center gap-3">
-                    {/* Key Status */}
+
+                    {/* Key Status (First) */}
                     {!keyAuthorized ? (
                         <button
                             onClick={handleSelectKey}
@@ -87,7 +104,38 @@ export const Header: React.FC<HeaderProps> = ({
                         </div>
                     )}
 
+                    {/* Archive Box & Tooltip Container (Second) */}
+                    <div className="relative w-9 h-9 flex items-center justify-center">
+                        <button
+                            onClick={onOpenArchive}
+                            className={`relative p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-colors group ${isShaking ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}
+                            title={lang === 'en' ? 'Archive Box' : '本地档案盒'}
+                            style={isShaking ? { animation: 'shake 0.5s ease-in-out' } : {}}
+                        >
+                            <style>{`
+                                @keyframes shake {
+                                    0%, 100% { transform: rotate(0deg); }
+                                    20% { transform: rotate(-10deg); }
+                                    40% { transform: rotate(10deg); }
+                                    60% { transform: rotate(-5deg); }
+                                    80% { transform: rotate(5deg); }
+                                }
+                            `}</style>
+                            <Archive className={`w-5 h-5 group-hover:text-indigo-500 transition-colors ${isShaking ? 'text-indigo-500' : ''}`} />
+
+                            {(totalCount !== undefined && totalCount > 0) && (
+                                <span key={totalCount} className={`absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-zinc-950 ${isShaking ? 'scale-125' : 'scale-100'} transition-transform duration-200`}>
+                                    {totalCount}
+                                </span>
+                            )}
+                        </button>
+
+                        {/* Tooltip inside flex relative container - perfect center */}
+                        <OnboardingTooltip lang={lang} />
+                    </div>
+
                     <div className="h-6 w-px bg-zinc-200 dark:bg-white/10 mx-2"></div>
+
 
                     {/* GitHub Link */}
                     <a

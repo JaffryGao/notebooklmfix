@@ -1,7 +1,7 @@
 {
   "name": "notebooklm-fixer",
   "private": true,
-  "version": "1.1.0",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,10 @@
     "@google/genai": "^1.34.0",
     "@types/file-saver": "^2.0.7",
     "@vercel/kv": "^3.0.0",
+    "dexie": "^4.2.1",
+    "dexie-react-hooks": "^4.2.0",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.23.26",
     "jspdf": "^3.0.4",
     "jszip": "^3.10.1",
     "lucide-react": "^0.562.0",

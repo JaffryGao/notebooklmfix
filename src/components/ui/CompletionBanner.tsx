@@ -7,7 +7,8 @@ import {
     Presentation,
     Download,
     Upload,
-    X
+    X,
+    Archive
 } from 'lucide-react';
 
 interface CompletionBannerProps {
@@ -63,6 +64,12 @@ export const CompletionBanner: React.FC<CompletionBannerProps> = ({
                                 ? `${completedCount} ${lang === 'en' ? 'pages ready' : '页已就绪'}`
                                 : t.downloadNow}
                         </p>
+                        {!isStopped && (
+                            <div className="flex items-center gap-1 text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
+                                <Archive className="w-3 h-3" />
+                                <span>{lang === 'en' ? 'Saved to Archive Box' : '已存入本地档案盒'}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
