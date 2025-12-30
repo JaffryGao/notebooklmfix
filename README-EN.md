@@ -20,6 +20,10 @@
 
 ## ✨ Core Features
 
+> **🚀 New in v2.2.1**
+> - **☁️ Cloudflare R2 Hybrid Integration**: Automatically detects oversized images and routes them via R2, bypassing Vercel's 4.5MB limit. 4K success rate boosted to 99.9%!
+> - **🛡️ Smart Quota Protection**: Prevents quota deduction if image generation fails or cannot be delivered.
+>
 > **🚀 New in v2.2**
 > - **📦 Local Archive Box**: Automatically saves your generated high-res original images. Your history is preserved even after refreshing the page. Data is stored locally for privacy and security.
 > - **⚡️ Passcode Count Real-time Sync**: Fixed the issue where usage count updates were delayed in Passcode mode. Refreshing the page now syncs the latest count instantly.

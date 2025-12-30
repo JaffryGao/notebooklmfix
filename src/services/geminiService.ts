@@ -144,13 +144,31 @@ export const processImageWithGemini = async (
       }
 
       const data = await response.json();
-      // Extract image from response validation
+      // Extract image from response validation (Hybrid: R2 URL or Base64)
       let imageStr = '';
       if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
         for (const part of data.candidates[0].content.parts) {
+          // Case 1: Standard Base64 (Small Images)
           if (part.inlineData && part.inlineData.data) {
             imageStr = `data:image/png;base64,${part.inlineData.data}`;
             break;
+          }
+          // Case 2: R2 Signed URL (Large Images)
+          if (part.imageUrl) {
+            try {
+              console.log("Fetching large image from R2...", part.imageUrl);
+              const r2Res = await fetch(part.imageUrl);
+              const blob = await r2Res.blob();
+              const reader = new FileReader();
+              imageStr = await new Promise((resolve) => {
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(blob);
+              });
+              break;
+            } catch (fetchErr) {
+              console.error("Failed to fetch image from R2", fetchErr);
+              throw new Error("Failed to download large image");
+            }
           }
         }
       }
