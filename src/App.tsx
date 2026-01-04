@@ -25,6 +25,7 @@ import { ComparisonModal } from './components/modals/ComparisonModal';
 import { ZoomModal } from './components/modals/ZoomModal';
 import { ApiKeyModal } from './components/modals/ApiKeyModal';
 import { ArchiveModal } from './components/modals/ArchiveModal';
+import { LegalModal } from './components/modals/LegalModal';
 import { AmbientBackground } from './components/ui/AmbientBackground';
 
 // Types & Assets
@@ -94,6 +95,8 @@ const App: React.FC = () => {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalInitialTab, setLegalInitialTab] = useState<'privacy' | 'terms'>('privacy');
   const [uploadMode, setUploadMode] = useState<'pdf' | 'image'>('pdf');
   const [showUploadWarning, setShowUploadWarning] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false); // Track if user downloaded
@@ -467,7 +470,10 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer t={t} onOpenLegal={(tab) => {
+        setLegalInitialTab(tab);
+        setIsLegalModalOpen(true);
+      }} />
 
       <CompletionBanner
         show={showCompletionBanner}
@@ -514,6 +520,13 @@ const App: React.FC = () => {
           setIsKeyModalOpen(false);
         }}
         lang={lang}
+      />
+
+      <LegalModal
+        isOpen={isLegalModalOpen}
+        onClose={() => setIsLegalModalOpen(false)}
+        lang={lang}
+        initialTab={legalInitialTab}
       />
 
     </div>

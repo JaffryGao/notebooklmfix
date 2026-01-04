@@ -3,9 +3,10 @@ import { Github } from 'lucide-react';
 
 interface FooterProps {
     t: any;
+    onOpenLegal?: (tab: 'privacy' | 'terms') => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ t }) => {
+export const Footer: React.FC<FooterProps> = ({ t, onOpenLegal }) => {
     return (
         <footer className="w-full py-12 mt-auto border-t border-zinc-200/50 dark:border-white/5 bg-zinc-50/50 dark:bg-black/20 backdrop-blur-sm">
             <div className="max-w-5xl mx-auto px-6 flex flex-col gap-8">
@@ -27,8 +28,18 @@ export const Footer: React.FC<FooterProps> = ({ t }) => {
 
                     {/* Links */}
                     <div className="flex items-center gap-6">
-                        <span className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer">{t.privacy}</span>
-                        <span className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer">{t.terms}</span>
+                        <button
+                            onClick={() => onOpenLegal?.('privacy')}
+                            className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                        >
+                            {t.privacy}
+                        </button>
+                        <button
+                            onClick={() => onOpenLegal?.('terms')}
+                            className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                        >
+                            {t.terms}
+                        </button>
 
                         <div className="h-3 w-px bg-zinc-200 dark:bg-white/10"></div>
 
