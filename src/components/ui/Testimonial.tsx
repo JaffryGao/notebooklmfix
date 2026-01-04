@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, Quote } from 'lucide-react';
+import { Crown } from 'lucide-react';
 
 interface TestimonialProps {
     lang: 'en' | 'cn';
@@ -128,19 +128,8 @@ const ReviewCard: React.FC<{ review: Review; lang: 'en' | 'cn' }> = ({ review, l
                    hover:border-indigo-200 dark:hover:border-indigo-500/30"
         style={{ width: CARD_WIDTH }}
     >
-        {/* Quote Icon */}
-        <Quote className="w-6 h-6 text-indigo-400/40 dark:text-indigo-400/30 mb-3" />
-
-        {/* Content */}
-        <p className="text-[15px] text-zinc-700 dark:text-zinc-200 leading-relaxed mb-5 font-medium">
-            {lang === 'en' ? review.contentEn : review.content}
-        </p>
-
-        {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-700 to-transparent mb-4" />
-
-        {/* Footer: Avatar + Name + Platform */}
-        <div className="flex items-center justify-between">
+        {/* Header: Avatar + Name + Platform */}
+        <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-800/50 dark:to-purple-800/50 flex items-center justify-center text-xl shadow-inner">
                     {review.avatar}
@@ -152,6 +141,14 @@ const ReviewCard: React.FC<{ review: Review; lang: 'en' | 'cn' }> = ({ review, l
             </div>
             <PlatformBadge platform={review.platform} />
         </div>
+
+        {/* Divider - lighter */}
+        <div className="h-px bg-zinc-100 dark:bg-zinc-800 mb-4" />
+
+        {/* Content */}
+        <p className="text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            "{lang === 'en' ? review.contentEn : review.content}"
+        </p>
     </div>
 );
 
@@ -234,12 +231,12 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
             {/* Social Proof Stats */}
             <div className="flex items-center justify-center gap-10 mt-10 pt-8 border-t border-zinc-200/50 dark:border-white/5">
                 <div className="text-center">
-                    <p className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{imagesFixed.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-zinc-900 dark:text-white">{imagesFixed.toLocaleString()}</p>
                     <p className="text-xs text-zinc-500 mt-1">{lang === 'en' ? 'Images Fixed' : '图片已修复'}</p>
                 </div>
-                <div className="w-px h-10 bg-gradient-to-b from-transparent via-zinc-300 dark:via-zinc-600 to-transparent"></div>
+                <div className="w-px h-10 bg-zinc-200 dark:bg-zinc-700"></div>
                 <div className="text-center">
-                    <p className="text-3xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">98%</p>
+                    <p className="text-3xl font-bold text-zinc-900 dark:text-white">98%</p>
                     <p className="text-xs text-zinc-500 mt-1">{lang === 'en' ? 'Success Rate' : '成功率'}</p>
                 </div>
             </div>
