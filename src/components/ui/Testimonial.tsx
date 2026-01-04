@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Crown } from 'lucide-react';
+import { Crown, Quote } from 'lucide-react';
 
 interface TestimonialProps {
     lang: 'en' | 'cn';
@@ -100,55 +100,77 @@ const REVIEWS: Review[] = [
     }
 ];
 
-const CARD_WIDTH = 300;
-const GAP = 20;
+const CARD_WIDTH = 320;
+const GAP = 24;
 
 const PlatformBadge: React.FC<{ platform: Review['platform'] }> = ({ platform }) => {
     const config = {
-        wechat: { bg: 'bg-[#07C160]/10', text: 'text-[#07C160]', label: '微信' },
-        xiaohongshu: { bg: 'bg-red-500/10', text: 'text-red-500', label: '小红书' },
-        jike: { bg: 'bg-yellow-500/10', text: 'text-yellow-600', label: '即刻' },
+        wechat: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', label: '微信' },
+        xiaohongshu: { bg: 'bg-rose-500/10', text: 'text-rose-500', label: '小红书' },
+        jike: { bg: 'bg-amber-500/10', text: 'text-amber-500', label: '即刻' },
         twitter: { bg: 'bg-sky-500/10', text: 'text-sky-500', label: 'X' }
     };
     const c = config[platform];
     return (
-        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${c.bg} ${c.text}`}>
+        <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full ${c.bg} ${c.text} tracking-wide`}>
             {c.label}
         </span>
     );
 };
 
-// Single review card component
+// Premium review card with glassmorphism effect
 const ReviewCard: React.FC<{ review: Review; lang: 'en' | 'cn' }> = ({ review, lang }) => (
     <div
-        className="flex-shrink-0 p-5 bg-white dark:bg-zinc-900/80 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm"
+        className="flex-shrink-0 p-6 rounded-3xl backdrop-blur-sm border transition-all duration-300
+                   bg-gradient-to-br from-white/80 to-white/40 border-zinc-200/60 shadow-[0_8px_32px_rgba(0,0,0,0.06)]
+                   dark:from-zinc-900/80 dark:to-zinc-900/40 dark:border-white/10 dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+                   hover:shadow-[0_12px_48px_rgba(99,102,241,0.12)] dark:hover:shadow-[0_12px_48px_rgba(99,102,241,0.2)]
+                   hover:border-indigo-200 dark:hover:border-indigo-500/30"
         style={{ width: CARD_WIDTH }}
     >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-3">
+        {/* Quote Icon */}
+        <Quote className="w-6 h-6 text-indigo-400/40 dark:text-indigo-400/30 mb-3" />
+
+        {/* Content */}
+        <p className="text-[15px] text-zinc-700 dark:text-zinc-200 leading-relaxed mb-5 font-medium">
+            {lang === 'en' ? review.contentEn : review.content}
+        </p>
+
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-700 to-transparent mb-4" />
+
+        {/* Footer: Avatar + Name + Platform */}
+        <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 flex items-center justify-center text-lg ring-2 ring-white dark:ring-zinc-800 shadow-sm">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-800/50 dark:to-purple-800/50 flex items-center justify-center text-xl shadow-inner">
                     {review.avatar}
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">{review.name}</p>
+                    <p className="text-sm font-semibold text-zinc-800 dark:text-white">{review.name}</p>
                     {review.role && <p className="text-xs text-zinc-500 dark:text-zinc-400">{review.role}</p>}
                 </div>
             </div>
             <PlatformBadge platform={review.platform} />
         </div>
-
-        {/* Content */}
-        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
-            "{lang === 'en' ? review.contentEn : review.content}"
-        </p>
     </div>
 );
 
+// CSS keyframes for smooth infinite scroll
+const marqueeCSS = `
+@keyframes scroll-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-${CARD_WIDTH + GAP}px * ${REVIEWS.length})); }
+}
+.marquee-track {
+    animation: scroll-marquee 60s linear infinite;
+}
+.marquee-track:hover {
+    animation-play-state: paused;
+}
+`;
+
 export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
     const [imagesFixed, setImagesFixed] = useState(2849);
-    const [isPaused, setIsPaused] = useState(false);
-    const trackRef = useRef<HTMLDivElement>(null);
 
     // 获取真实统计数据
     useEffect(() => {
@@ -162,10 +184,8 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
             .catch(() => { });
     }, []);
 
-    // 每个卡片的总宽度（包括间距）
-    const itemWidth = CARD_WIDTH + GAP;
-    // 一轮的总宽度
-    const totalWidth = itemWidth * REVIEWS.length;
+    // 复制 3 组保证无缝
+    const tripleReviews = [...REVIEWS, ...REVIEWS, ...REVIEWS];
 
     return (
         <motion.div
@@ -175,66 +195,52 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="w-full"
         >
+            {/* Inject CSS */}
+            <style>{marqueeCSS}</style>
+
             {/* Section Header */}
-            <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 rounded-full mb-4">
+            <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-full mb-4 border border-amber-500/20">
                     <Crown className="w-4 h-4 text-amber-500" />
-                    <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                    <span className="text-sm font-medium bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">
                         {lang === 'en' ? 'User Reviews' : '用户评价'}
                     </span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-heading font-bold text-zinc-900 dark:text-white mb-2">
+                <h3 className="text-2xl md:text-3xl font-heading font-bold text-zinc-900 dark:text-white mb-3">
                     {lang === 'en' ? 'What Our Users Say' : '听听他们怎么说'}
                 </h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
                     {lang === 'en' ? 'Join 100+ users who fixed their NotebookLM exports' : '已有 100+ 用户成功修复了他们的导出图片'}
                 </p>
             </div>
 
-            {/* Infinite Marquee */}
-            <div
-                className="relative overflow-hidden"
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
-            >
+            {/* Infinite Marquee - Pure CSS (no jitter on hover) */}
+            <div className="relative overflow-hidden py-2">
                 {/* Gradient Masks */}
-                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-zinc-50 via-zinc-50/80 dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-zinc-50 via-zinc-50/80 dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute left-0 top-0 bottom-0 w-28 bg-gradient-to-r from-zinc-50 via-zinc-50/90 dark:from-zinc-950 dark:via-zinc-950/90 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-28 bg-gradient-to-l from-zinc-50 via-zinc-50/90 dark:from-zinc-950 dark:via-zinc-950/90 to-transparent z-10 pointer-events-none" />
 
-                {/* Scrolling Track with Framer Motion */}
-                <motion.div
-                    ref={trackRef}
-                    className="flex py-2"
-                    style={{ gap: GAP }}
-                    animate={{
-                        x: isPaused ? undefined : [0, -totalWidth]
-                    }}
-                    transition={{
-                        x: {
-                            duration: 30,
-                            repeat: Infinity,
-                            ease: "linear",
-                            repeatType: "loop"
-                        }
-                    }}
+                {/* Scrolling Track - Pure CSS Animation */}
+                <div
+                    className="flex marquee-track"
+                    style={{ gap: GAP, width: 'max-content' }}
                 >
-                    {/* 渲染 3 组卡片确保无缝 */}
-                    {[...REVIEWS, ...REVIEWS, ...REVIEWS].map((review, idx) => (
+                    {tripleReviews.map((review, idx) => (
                         <ReviewCard key={`${review.id}-${idx}`} review={review} lang={lang} />
                     ))}
-                </motion.div>
+                </div>
             </div>
 
             {/* Social Proof Stats */}
-            <div className="flex items-center justify-center gap-8 mt-8 pt-6 border-t border-zinc-200/50 dark:border-white/5">
+            <div className="flex items-center justify-center gap-10 mt-10 pt-8 border-t border-zinc-200/50 dark:border-white/5">
                 <div className="text-center">
-                    <p className="text-2xl font-bold text-zinc-900 dark:text-white">{imagesFixed.toLocaleString()}</p>
-                    <p className="text-xs text-zinc-500">{lang === 'en' ? 'Images Fixed' : '图片已修复'}</p>
+                    <p className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{imagesFixed.toLocaleString()}</p>
+                    <p className="text-xs text-zinc-500 mt-1">{lang === 'en' ? 'Images Fixed' : '图片已修复'}</p>
                 </div>
-                <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700"></div>
+                <div className="w-px h-10 bg-gradient-to-b from-transparent via-zinc-300 dark:via-zinc-600 to-transparent"></div>
                 <div className="text-center">
-                    <p className="text-2xl font-bold text-zinc-900 dark:text-white">98%</p>
-                    <p className="text-xs text-zinc-500">{lang === 'en' ? 'Success Rate' : '成功率'}</p>
+                    <p className="text-3xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">98%</p>
+                    <p className="text-xs text-zinc-500 mt-1">{lang === 'en' ? 'Success Rate' : '成功率'}</p>
                 </div>
             </div>
         </motion.div>
