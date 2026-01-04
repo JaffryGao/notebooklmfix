@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Crown } from 'lucide-react';
 
@@ -100,6 +100,9 @@ const REVIEWS: Review[] = [
     }
 ];
 
+const CARD_WIDTH = 300;
+const GAP = 20;
+
 const PlatformBadge: React.FC<{ platform: Review['platform'] }> = ({ platform }) => {
     const config = {
         wechat: { bg: 'bg-[#07C160]/10', text: 'text-[#07C160]', label: '微信' },
@@ -117,7 +120,10 @@ const PlatformBadge: React.FC<{ platform: Review['platform'] }> = ({ platform })
 
 // Single review card component
 const ReviewCard: React.FC<{ review: Review; lang: 'en' | 'cn' }> = ({ review, lang }) => (
-    <div className="flex-shrink-0 w-[300px] p-5 bg-white dark:bg-zinc-900/80 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+    <div
+        className="flex-shrink-0 p-5 bg-white dark:bg-zinc-900/80 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm"
+        style={{ width: CARD_WIDTH }}
+    >
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -139,22 +145,10 @@ const ReviewCard: React.FC<{ review: Review; lang: 'en' | 'cn' }> = ({ review, l
     </div>
 );
 
-// CSS for infinite scroll animation
-const marqueeStyles = `
-@keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-.animate-marquee {
-    animation: marquee 60s linear infinite;
-}
-.animate-marquee:hover {
-    animation-play-state: paused;
-}
-`;
-
 export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
     const [imagesFixed, setImagesFixed] = useState(2849);
+    const [isPaused, setIsPaused] = useState(false);
+    const trackRef = useRef<HTMLDivElement>(null);
 
     // 获取真实统计数据
     useEffect(() => {
@@ -165,13 +159,13 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
                     setImagesFixed(data.imagesFixed);
                 }
             })
-            .catch(() => {
-                // 失败时使用默认值
-            });
+            .catch(() => { });
     }, []);
 
-    // 复制数组实现无缝循环
-    const duplicatedReviews = [...REVIEWS, ...REVIEWS];
+    // 每个卡片的总宽度（包括间距）
+    const itemWidth = CARD_WIDTH + GAP;
+    // 一轮的总宽度
+    const totalWidth = itemWidth * REVIEWS.length;
 
     return (
         <motion.div
@@ -181,9 +175,6 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="w-full"
         >
-            {/* Inject CSS */}
-            <style>{marqueeStyles}</style>
-
             {/* Section Header */}
             <div className="text-center mb-8">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 rounded-full mb-4">
@@ -200,18 +191,38 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
                 </p>
             </div>
 
-            {/* Infinite Marquee - Pure CSS */}
-            <div className="relative overflow-hidden">
-                {/* Gradient Masks - Stronger */}
-                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-zinc-50 via-zinc-50/90 dark:from-zinc-950 dark:via-zinc-950/90 to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-zinc-50 via-zinc-50/90 dark:from-zinc-950 dark:via-zinc-950/90 to-transparent z-10 pointer-events-none" />
+            {/* Infinite Marquee */}
+            <div
+                className="relative overflow-hidden"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+            >
+                {/* Gradient Masks */}
+                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-zinc-50 via-zinc-50/80 dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-zinc-50 via-zinc-50/80 dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />
 
-                {/* Scrolling Track - CSS Animation */}
-                <div className="flex gap-5 py-2 animate-marquee" style={{ width: 'max-content' }}>
-                    {duplicatedReviews.map((review, idx) => (
+                {/* Scrolling Track with Framer Motion */}
+                <motion.div
+                    ref={trackRef}
+                    className="flex py-2"
+                    style={{ gap: GAP }}
+                    animate={{
+                        x: isPaused ? undefined : [0, -totalWidth]
+                    }}
+                    transition={{
+                        x: {
+                            duration: 30,
+                            repeat: Infinity,
+                            ease: "linear",
+                            repeatType: "loop"
+                        }
+                    }}
+                >
+                    {/* 渲染 3 组卡片确保无缝 */}
+                    {[...REVIEWS, ...REVIEWS, ...REVIEWS].map((review, idx) => (
                         <ReviewCard key={`${review.id}-${idx}`} review={review} lang={lang} />
                     ))}
-                </div>
+                </motion.div>
             </div>
 
             {/* Social Proof Stats */}
