@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Star, Quote } from 'lucide-react';
 
 interface TestimonialProps {
     lang: 'en' | 'cn';
@@ -10,7 +10,7 @@ interface Review {
     id: number;
     name: string;
     role: string;
-    avatar: string; // Initial letter or emoji
+    avatar: string;
     content: string;
     contentEn: string;
     rating: number;
@@ -20,8 +20,8 @@ interface Review {
 const REVIEWS: Review[] = [
     {
         id: 1,
-        name: '林小雨',
-        role: '产品经理 @字节跳动',
+        name: '林**',
+        role: '产品经理',
         avatar: '🌸',
         content: '之前用 NotebookLM 做产品分析，导出的 PDF 糊得没法看。用这个修复后清晰度提升太明显了，4K 效果直接能放进 PPT 汇报用。',
         contentEn: 'NotebookLM exports were too blurry for product analysis. After using this tool, the 4K quality is perfect for executive presentations.',
@@ -30,8 +30,8 @@ const REVIEWS: Review[] = [
     },
     {
         id: 2,
-        name: '张同学',
-        role: '研究生 @清华大学',
+        name: '张*学',
+        role: '大学生',
         avatar: '📚',
         content: '论文答辩前一晚发现导出图全是模糊的，差点崩溃。室友推荐了这个工具，20 张图 10 分钟全搞定，救我一命！',
         contentEn: 'Found all my thesis diagrams were blurry the night before defense. This tool fixed 20 images in 10 minutes. Lifesaver!',
@@ -40,8 +40,8 @@ const REVIEWS: Review[] = [
     },
     {
         id: 3,
-        name: 'Alex Wang',
-        role: 'UX Designer @Figma',
+        name: 'A***x',
+        role: 'UI 设计师',
         avatar: '🎨',
         content: '作为设计师对画质要求很高。这个工具不仅修复清晰度，还保留了原图的色彩和细节，比我想象中好太多。',
         contentEn: 'As a designer, I\'m picky about quality. This tool not only restores clarity but preserves colors and details. Exceeded expectations.',
@@ -50,8 +50,8 @@ const REVIEWS: Review[] = [
     },
     {
         id: 4,
-        name: '陈老师',
-        role: '高中语文教师',
+        name: '陈*师',
+        role: '高中老师',
         avatar: '👨‍🏫',
         content: '给学生做学习资料，NotebookLM 很好用但导出质量一直是痛点。现在终于解决了，感谢开发者！',
         contentEn: 'Creating study materials for students - NotebookLM is great but export quality was always an issue. Finally solved!',
@@ -60,7 +60,7 @@ const REVIEWS: Review[] = [
     },
     {
         id: 5,
-        name: '小美',
+        name: '小*',
         role: '自媒体博主',
         avatar: '✨',
         content: '做知识视频需要高清配图，之前一直手动截图很麻烦。这个工具批量处理太方便了，省了超多时间。',
@@ -70,13 +70,33 @@ const REVIEWS: Review[] = [
     },
     {
         id: 6,
-        name: 'Kevin Liu',
-        role: 'Tech Lead @Google',
+        name: 'K***n',
+        role: '程序员',
         avatar: '💻',
         content: '终于有人做了这个工具！之前一直忍受糊图，现在完美解决。代码也开源了，respect 👏',
         contentEn: 'Finally someone built this! Been tolerating blurry exports forever. Now perfectly solved. Open source too, respect 👏',
         rating: 5,
         platform: 'jike'
+    },
+    {
+        id: 7,
+        name: '王*',
+        role: '运营',
+        avatar: '📊',
+        content: '做竞品分析报告必备！之前截图糊成一片，现在导出的图清清楚楚，领导都夸报告质量提升了。',
+        contentEn: 'Essential for competitive analysis reports! Screenshots are now crystal clear, boss praised the improved report quality.',
+        rating: 5,
+        platform: 'wechat'
+    },
+    {
+        id: 8,
+        name: '李**',
+        role: '销售',
+        avatar: '💼',
+        content: '给客户做方案的时候用 NotebookLM 整理资料，之前导出图片糊了好尴尬。现在终于可以放心用了！',
+        contentEn: 'Using NotebookLM to prepare client proposals - blurry exports were embarrassing. Now I can confidently use it!',
+        rating: 5,
+        platform: 'xiaohongshu'
     }
 ];
 
@@ -106,35 +126,38 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
     </div>
 );
 
+// Single review card component
+const ReviewCard: React.FC<{ review: Review; lang: 'en' | 'cn' }> = ({ review, lang }) => (
+    <div className="flex-shrink-0 w-[300px] p-5 bg-white dark:bg-zinc-900/80 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 flex items-center justify-center text-lg ring-2 ring-white dark:ring-zinc-800 shadow-sm">
+                    {review.avatar}
+                </div>
+                <div>
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">{review.name}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">{review.role}</p>
+                </div>
+            </div>
+            <PlatformBadge platform={review.platform} />
+        </div>
+
+        {/* Rating */}
+        <div className="mb-2">
+            <StarRating rating={review.rating} />
+        </div>
+
+        {/* Content */}
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-3">
+            "{lang === 'en' ? review.contentEn : review.content}"
+        </p>
+    </div>
+);
+
 export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(true);
-
-    const checkScroll = () => {
-        if (!scrollRef.current) return;
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        setCanScrollLeft(scrollLeft > 10);
-        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    };
-
-    useEffect(() => {
-        const el = scrollRef.current;
-        if (el) {
-            el.addEventListener('scroll', checkScroll);
-            checkScroll();
-            return () => el.removeEventListener('scroll', checkScroll);
-        }
-    }, []);
-
-    const scroll = (direction: 'left' | 'right') => {
-        if (!scrollRef.current) return;
-        const scrollAmount = 340;
-        scrollRef.current.scrollBy({
-            left: direction === 'left' ? -scrollAmount : scrollAmount,
-            behavior: 'smooth'
-        });
-    };
+    // 复制数组以实现无缝循环
+    const duplicatedReviews = [...REVIEWS, ...REVIEWS];
 
     return (
         <motion.div
@@ -160,65 +183,30 @@ export const Testimonial: React.FC<TestimonialProps> = ({ lang }) => {
                 </p>
             </div>
 
-            {/* Scroll Container */}
-            <div className="relative">
-                {/* Left Arrow */}
-                <button
-                    onClick={() => scroll('left')}
-                    className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white dark:bg-zinc-800 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            {/* Auto-scrolling Marquee */}
+            <div className="relative overflow-hidden">
+                {/* Gradient Masks */}
+                <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent z-10 pointer-events-none" />
+
+                {/* Scrolling Track */}
+                <motion.div
+                    className="flex gap-5 py-2"
+                    animate={{
+                        x: [0, -((300 + 20) * REVIEWS.length)]
+                    }}
+                    transition={{
+                        x: {
+                            duration: 40,
+                            repeat: Infinity,
+                            ease: "linear"
+                        }
+                    }}
                 >
-                    <ChevronLeft className="w-5 h-5" />
-                </button>
-
-                {/* Right Arrow */}
-                <button
-                    onClick={() => scroll('right')}
-                    className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white dark:bg-zinc-800 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                >
-                    <ChevronRight className="w-5 h-5" />
-                </button>
-
-                {/* Cards Container */}
-                <div
-                    ref={scrollRef}
-                    className="flex gap-5 overflow-x-auto pb-4 px-1 scrollbar-hide scroll-smooth"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                    {REVIEWS.map((review, idx) => (
-                        <motion.div
-                            key={review.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: idx * 0.1 }}
-                            className="flex-shrink-0 w-[320px] p-5 bg-white dark:bg-zinc-900/80 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm hover:shadow-lg dark:shadow-black/20 transition-all duration-300 cursor-pointer group"
-                        >
-                            {/* Header: Avatar + Name + Platform */}
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 flex items-center justify-center text-lg ring-2 ring-white dark:ring-zinc-800 shadow-sm">
-                                        {review.avatar}
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-zinc-900 dark:text-white">{review.name}</p>
-                                        <p className="text-xs text-zinc-500 dark:text-zinc-400">{review.role}</p>
-                                    </div>
-                                </div>
-                                <PlatformBadge platform={review.platform} />
-                            </div>
-
-                            {/* Rating */}
-                            <div className="mb-3">
-                                <StarRating rating={review.rating} />
-                            </div>
-
-                            {/* Content */}
-                            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-4 group-hover:line-clamp-none transition-all">
-                                "{lang === 'en' ? review.contentEn : review.content}"
-                            </p>
-                        </motion.div>
+                    {duplicatedReviews.map((review, idx) => (
+                        <ReviewCard key={`${review.id}-${idx}`} review={review} lang={lang} />
                     ))}
-                </div>
+                </motion.div>
             </div>
 
             {/* Social Proof Stats */}
